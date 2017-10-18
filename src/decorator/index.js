@@ -1,8 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { each, mapValues, map } from 'lodash'
+import qs from 'qs'
 
-const getParamsHash = params => JSON.stringify(params)
+export const getParamsHash = params => qs.stringify(params, { arrayFormat: 'brackets' })
 
 const getData = (state, reducer, params) => {
   const hash = getParamsHash(params)
@@ -12,6 +13,7 @@ const getData = (state, reducer, params) => {
     data: query && query.ids && map(query.ids, id => state[reducer].data[id]),
     loading: query && query.loading,
     error: query && query.error,
+    reducer,
     params,
     hash
   }
@@ -49,11 +51,11 @@ export default entities => (BaseComponent) => {
 
         if (entity === undefined) return false
 
-        const { data, loading, error, params, hash } = entity
+        const { reducer, data, loading, error, params, hash } = entity
 
         if (!data && !loading && (!error || force)) {
           this.props.dispatch({
-            rest: [key, 'index', params],
+            rest: [reducer, 'index', params],
             payload: { params, hash }
           })
         }
